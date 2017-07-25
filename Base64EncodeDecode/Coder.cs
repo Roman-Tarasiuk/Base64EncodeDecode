@@ -10,68 +10,91 @@ namespace Base64EncodeDecode
 {
     class Coder
     {
-        public static bool Encode(string inputPath, string outputPath)
+        public static bool Encode(string input, string output)
         {
-            if (!File.Exists(inputPath))
-            {
-                throw new ArgumentException("File '" + inputPath + "' does not exist or access is denided.");
-            }
+            string resultStr = String.Empty;
 
             byte[] bytes = null;
 
-            try
+            if (File.Exists(input))
             {
-                bytes = File.ReadAllBytes(inputPath);
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Exception in File.ReadAllBytes(path)", e);
-            }
-
-            try
-            {
-                using (StreamWriter writer = new StreamWriter(outputPath))
+                try
                 {
-                    writer.Write(Convert.ToBase64String(bytes));
+                    bytes = File.ReadAllBytes(input);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Exception in File.ReadAllBytes(path)", e);
                 }
             }
-            catch (Exception e)
+            else
             {
-                throw new Exception("Exception in StreamWriter.Write(string)", e);
+                bytes = Encoding.Unicode.GetBytes(input);
+            }
+
+            resultStr = Convert.ToBase64String(bytes);
+
+            if (output != null)
+            {
+                try
+                {
+                    using (StreamWriter writer = new StreamWriter(output))
+                    {
+                        writer.Write(resultStr);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Exception in StreamWriter.Write(string)", e);
+                }
+            }
+            else
+            {
+                Console.WriteLine(resultStr);
             }
 
             return true;
         }
 
-        public static bool Decode(string inputPath, string outputPath)
+        public static bool Decode(string input, string output)
         {
-            if (!File.Exists(inputPath))
-            {
-                throw new ArgumentException("File '" + inputPath + "' does not exist or access is denided.");
-            }
-
             string base64 = null;
-            try
+
+            if (File.Exists(input))
             {
-                using (StreamReader reader = new StreamReader(inputPath))
+                try
                 {
-                    base64 = reader.ReadToEnd();
+                    using (StreamReader reader = new StreamReader(input))
+                    {
+                        base64 = reader.ReadToEnd();
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Exception while opening/reading '" + input + "' file.", e);
                 }
             }
-            catch (Exception e)
+            else
             {
-                throw new Exception("Exception while opening/reading '" + inputPath + "' file.", e);
+                base64 = input;
             }
 
             byte[] bytes = Convert.FromBase64String(base64);
 
-            try
+            if (output != null)
             {
-                File.WriteAllBytes(outputPath, bytes);
+                try
+                {
+                    File.WriteAllBytes(output, bytes);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Exception in File.WriteAllBytes(outputPath, bytes)", e);
+                }
             }
-            catch (Exception e)
+            else
             {
-                throw new Exception("Exception in File.WriteAllBytes(outputPath, bytes)", e);
+                Console.WriteLine(Encoding.Unicode.GetString(bytes));
             }
 
             return true;

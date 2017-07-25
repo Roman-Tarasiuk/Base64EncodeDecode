@@ -12,6 +12,11 @@ namespace Base64EncodeDecode
     {
         static void Main(string[] args)
         {
+            ProcessInput(args);
+        }
+
+        private static void ProcessInput(string[] args)
+        {
             if (!CheckAttributes(args))
             {
                 ShowProgramUsage();
@@ -23,20 +28,20 @@ namespace Base64EncodeDecode
 
             if (args[0] == "-encode")
             {
-                completeSuccessfully = Coder.Encode(args[1], args[2]);
+                completeSuccessfully = Coder.Encode(args[1], args.Length > 2 ? args[2] : null);
             }
             else // "-decode"
             {
-                completeSuccessfully = Coder.Decode(args[1], args[2]);
+                completeSuccessfully = Coder.Decode(args[1], args.Length > 2 ? args[2] : null);
             }
 
             if (completeSuccessfully)
             {
-                Console.WriteLine("Success " + args[0].Substring(1) + ".");
+                Console.WriteLine("Success: " + args[0].Substring(1) + ".");
             }
             else
             {
-                Console.WriteLine("Failed " + args[0].Substring(1) + ".");
+                Console.WriteLine("Failed: " + args[0].Substring(1) + ".");
                 ShowProgramUsage();
             }
         }
@@ -46,17 +51,12 @@ namespace Base64EncodeDecode
 
         static bool CheckAttributes(string[] args)
         {
-            if (args.Length != 3)
+            if (args.Length < 2)
             {
                 return false;
             }
 
             if (args[0] != "-encode" && args[0] != "-decode")
-            {
-                return false;
-            }
-
-            if (!File.Exists(args[1]))
             {
                 return false;
             }
@@ -68,18 +68,8 @@ namespace Base64EncodeDecode
         {
             Console.WriteLine(
 @"Program usage:
- Base64EncodeDecode.exe -encode|-decode input_file_path output_file_path"
+ Base64EncodeDecode.exe -encode|-decode input_string|input_file_path [output_file_path]"
                 );
-        }
-
-        #endregion
-
-
-        #region ** Methods
-
-        static void Encode(string inputPath, string outputPath)
-        {
-             //Coder.Encode(inputPath)
         }
 
         #endregion
